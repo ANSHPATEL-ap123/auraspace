@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // The 'url' property is removed here! Prisma will auto-route it from prisma.config.ts / .env
+}
+
+// 1. The SaaS User Profile
+model User {
+  id            String            @id @default(cuid())
+  email         String            @unique
+  name          String?
+  avatarUrl     String?
+  createdAt     DateTime          @default(now())
+  
+  logs          ObservationLog[]
+}
+
+// 2. The Stellar Logbook Telemetry Matrix
+model ObservationLog {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  targetName    String   
+  captureDate   DateTime
+  location      String
+  bortleClass   Int?
+  
+  cameraBody    String
+  lensTelescope String
+  focalLength   String
+  iso           String
+  shutterSpeed  String
+  aperture      String
+  whiteBalance  String
+  focusMode     String
+  imageType     String
+  stackedFrames Int?
+  calibration   Boolean  @default(false)
+  processing    String?
+  
+  auraScore     Float?
+  imageUrl      String   
+  posterPdfUrl  String?  
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
