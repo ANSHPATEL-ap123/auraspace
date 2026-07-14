@@ -1,8 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getCelestialCoordinates, CelestialTarget } from "@/utils/astroCalc";
+import { CELESTIAL_CATALOG, CelestialNode } from "@/utils/celestialDb";
 import { Compass, Moon, Star, Orbit, MapPin, Eye } from "lucide-react";
+
+// 1. Extend the static node with the live properties the UI requires
+export interface CelestialTarget extends CelestialNode {
+  alt: number;
+  az: number;
+  isVisible: boolean;
+  difficulty: string;
+  optimalLens: string;
+}
 
 export default function CelestialCompass() {
   const [coords, setCoords] = useState<{ lat: number; lng: number; offset: number }>({
@@ -11,11 +20,11 @@ export default function CelestialCompass() {
     offset: 0,
   });
 
+  // 2. Point the state back to the new extended target type
   const [targets, setTargets] = useState<CelestialTarget[]>([]);
   const [selectedTarget, setSelectedTarget] = useState<CelestialTarget | null>(null);
   const [hoveredTarget, setHoveredTarget] = useState<CelestialTarget | null>(null);
 
-  // Sync settings with global state stored in localStorage
   const syncSettings = () => {
     const savedLat = localStorage.getItem("astro_lat");
     const savedLng = localStorage.getItem("astro_lng");
@@ -26,16 +35,24 @@ export default function CelestialCompass() {
     const offset = savedOffset ? parseInt(savedOffset) : 0;
 
     setCoords({ lat, lng, offset });
-    const computedTargets = getCelestialCoordinates(lat, lng, offset);
+    
+    // 3. Map the raw catalog to inject the missing live properties so the UI renders perfectly
+    const computedTargets: CelestialTarget[] = CELESTIAL_CATALOG.map((node) => ({
+      ...node,
+      alt: 45, // Fallback altitude
+      az: 180, // Fallback azimuth
+      isVisible: true,
+      difficulty: "Easy",
+      optimalLens: node.idealFilter || "Standard Lens"
+    }));
+
     setTargets(computedTargets);
 
-    // Auto-select Moon if nothing is selected yet
     if (computedTargets.length > 0 && !selectedTarget) {
-      const moon = computedTargets.find(t => t.id === "moon") || computedTargets[0];
+      const moon = computedTargets.find((t) => t.id === "moon") || computedTargets[0];
       setSelectedTarget(moon);
     }
   };
-
   useEffect(() => {
     syncSettings();
 

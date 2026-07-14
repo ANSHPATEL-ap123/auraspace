@@ -1,19 +1,18 @@
 export interface CelestialNode {
   id: string;
   name: string;
-  scientificName?: string;
+  scientificName?: string; // The question mark makes it optional
   category: "Solar System" | "Deep Space" | "Stars" | "Constellations" | "Dynamic Bodies";
-  ra: number; // Right Ascension in radians (0 to 2*PI)
-  dec: number; // Declination in degrees (-90 to 90)
-  magnitude: number; // Astronomical brightness (lower is brighter)
-  distance: string; // Distance from Earth
+  ra: number;
+  dec: number;
+  magnitude: number;
+  distance: string;
   constellation: string;
   description: string;
   bestViewingMonths: string;
   idealFilter?: string;
   type: string;
 }
-
 export const CELESTIAL_CATALOG: CelestialNode[] = [
   // 1. Solar System
   {
