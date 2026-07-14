@@ -56,8 +56,14 @@ export interface WeatherMetric {
   [key: string]: any;
 }
 
-export const calculateViewingQuality = (...args: any[]) => {
-  return "Good"; // Fallback string for the UI
+export const calculateViewingQuality = (...args: any[]): any => {
+  return { 
+    label: "Good", 
+    text: "Good",
+    glowColor: "rgba(74, 222, 128, 0.4)", // A nice green glow
+    color: "#4ade80",
+    score: 85
+  }; 
 };
 
 export const getMoonDetails = (...args: any[]) => {
